@@ -14,8 +14,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 # The build renders pages, which starts Payload: it gets a throwaway database
-# (migrated on startup) and secret. Neither ends up in the image.
-RUN DATABASE_URL=file:/tmp/build.db PAYLOAD_SECRET=build-only pnpm run build
+# and secret, which stay in this stage. The database is migrated once up front;
+# otherwise each build worker migrates it at the same time and SQLite locks.
+ENV DATABASE_URL=file:/tmp/build.db PAYLOAD_SECRET=build-only
+RUN pnpm payload migrate && pnpm run build
 
 FROM base AS runner
 WORKDIR /app
