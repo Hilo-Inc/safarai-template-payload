@@ -1,0 +1,16 @@
+# Run the published image locally: docker compose up, then open http://localhost:3000/admin
+services:
+  payload:
+    image: ghcr.io/hilo-inc/safarai-template-payload:latest
+    ports:
+      - '3000:3000'
+    environment:
+      SERVER_URL: http://localhost:3000
+      PAYLOAD_SECRET: change-me-to-a-long-random-string
+    volumes:
+      - data:/data
+      - media:/app/media
+
+volumes:
+  data:
+  media:
